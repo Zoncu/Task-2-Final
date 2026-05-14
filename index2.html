@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ĶLUS - Ķīmijas laboratorijas uzskaites sistēma</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+            color: #333;
+        }
+
+        .split-layout {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .left-panel {
+            background-color: #0099ff;
+            color: white;
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+
+        .left-panel h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .left-panel .divider {
+            width: 50%;
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.4);
+            margin: 1rem 0;
+        }
+
+        .left-panel p {
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .illustration {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            width: 250px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 3rem;
+            font-size: 5rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .right-panel {
+            width: 60%;
+            padding: 4rem 10%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .view { display: none; }
+        .view.active { display: flex; flex-direction: column; }
+        
+        h2 {
+            font-size: 2.2rem;
+            color: #0088ff;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 2.5rem;
+            line-height: 1.5;
+            max-width: 90%;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-right: 15px;
+        }
+
+        .btn-primary {
+            background-color: #0088ff;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 136, 255, 0.2);
+        }
+
+        .btn-primary:hover { background-color: #0077e6; }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #ccc;
+            color: #555;
+        }
+
+        .btn-outline:hover {
+            border-color: #0088ff;
+            color: #0088ff;
+        }
+
+        .btn-error {
+            background-color: #ff8c69;
+            color: white;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            box-shadow: 0 4px 6px rgba(255, 140, 105, 0.3);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .back-link {
+            color: #555;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        
+        .back-link:hover { color: #0088ff; }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            max-width: 350px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background-color: #fafafa;
+        }
+
+        .register-link {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .register-link a {
+            color: #0088ff;
+            text-decoration: none;
+        }
+
+        .view-3 {
+            padding: 3rem 5%;
+            background: white;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: #f9f9f9;
+            outline: none;
+            min-width: 200px;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid #0088ff;
+            background: white;
+            color: #0088ff;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: #0088ff;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin-bottom: 5rem;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #001f3f;
+            color: white;
+            font-weight: 500;
+        }
+
+        tr:nth-child(even) { background-color: #fcfcfc; }
+    </style>
+</head>
+
+
+
+<body>
+
+    <div id="split-layout" class="split-layout">
+        <div class="left-panel">
+            <h1>Esi sveicināts<br>ĶLUS</h1>
+            <div class="divider"></div>
+            <p>Tavas laboratorijas uzskaites sistēma</p>
+            <div class="illustration">🧪</div>
+        </div>
+        
+        <div class="right-panel">
+            <div id="view1" class="view active">
+                <h2>Ko Tu vēlies darīt<br>šodien?</h2>
+                <p class="subtitle">Piekļūsti savas skolas laboratorijai vai aplūko publiski pieejamo informāciju un datus par laboratoriju</p>
+                <div style="display: flex;">
+                    <button class="btn btn-primary" onclick="navigate('view2')">Pieslēgties</button>
+                    <button class="btn btn-outline" onclick="navigate('view3')">Piekļūt publiskiem datiem</button>
+                </div>
+            </div>
+
+            <div id="view2" class="view">
+                <div>
+                    <span class="back-link" onclick="navigate('view1')">&#8592; Atpakaļ uz sākumlapu</span>
+                </div>
+                <h2>Pieslēgties</h2>
+                <p class="subtitle" style="margin-bottom: 1.5rem;">Ķīmijas laboratorijas uzskaites sistēmai</p>
+                
+                <div class="form-group">
+                    <label>Lietotājvārds</label>
+                    <input type="text" placeholder="">
+                </div>
+                <div class="form-group">
+                    <label>Parole</label>
+                    <input type="password" placeholder="">
+                </div>
+                
+                <div>
+                    <button class="btn btn-primary" style="margin-top: 10px;">Pieslēgties</button>
+                </div>
+                
+                <div class="register-link">
+                    Neesi vēl reģistrēts? <a href="#">Izveidot profilu</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view3" class="view view-3">
+        <div>
+            <span class="back-link" onclick="navigate('view1')">&#8592; Atpakaļ uz sākumlapu</span>
+        </div>
+        
+        <h2>Publiskā datubāze</h2>
+        <p class="subtitle">Šajā datubāzē Tu vari apskatīt pieejamās vielas un aprīkojumu</p>
+        
+        <div class="filter-bar">
+            <input type="text" class="search-box" placeholder="Meklēt...">
+            <button class="filter-btn active" id="btn-visu" onclick="filterData('visu')">Rādīt visu</button>
+            <button class="filter-btn" id="btn-vielas" onclick="filterData('vielas')">Rādīt vielas</button>
+            <button class="filter-btn" id="btn-inventars" onclick="filterData('inventars')">Rādīt aprīkojumu</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nosaukums</th>
+                    <th>Tips</th>
+                    <th>Apakštips</th>
+                    <th>Skaits</th>
+                    <th>Svars/Daudzums</th>
+                    <th>Komentāri</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                </tbody>
+        </table>
+    </div>
+
+    <button class="btn-error">Ziņot par kļūdu</button>
+
+    <script>
+        const vielasData = [
+            { "apakstips": "sāls", "daudzums": 100, "id": 2, "komentari": "", "mervienibas": "g", "nosaukums": "Kalcija karbonāts CaCO3", "skaits": 25, "tips": "reaģents" },
+            { "apakstips": "hidroksīds", "daudzums": 50, "id": 3, "komentari": "Šķīdums izvedots un sapildīts 2020.09.23", "mervienibas": "ml", "nosaukums": "NaOH šķīdums 10%", "skaits": 45, "tips": "reaģents" },
+            { "apakstips": "skābe", "daudzums": 100, "id": 4, "komentari": "Šķīdums izvedots un sapildīts 2020.10.21", "mervienibas": "ml", "nosaukums": "Sālsskābes HCl šķīdums 20%", "skaits": 24, "tips": "reaģents" },
+            { "apakstips": "test1", "daudzums": 50, "id": 5, "komentari": "Šķīdums izvedots un sapildīts 2020.09.23", "mervienibas": "ml", "nosaukums": "NaOH šķīdums 10%", "skaits": 45, "tips": "reaģents" },
+            { "apakstips": "hidroksīds", "daudzums": 100, "id": 6, "komentari": "Šķīdums izvedots un sapildīts 2020.10.21", "mervienibas": "ml", "nosaukums": "NaOH šķīdums 20%", "skaits": 413, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 50, "id": 7, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "NaOH šķīdums 10%", "skaits": 45, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 8, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 9, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 10, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 11, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 12, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 13, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 14, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 15, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" }
+        ];
+
+        const inventarsData = [
+            { "apakstips": "mehāniskie svari", "id": 1, "komentari": "", "nosaukums": "Mehāniskie svari QWS", "skaits": 5, "tips": "svari" },
+            { "apakstips": "elektroniskie svari", "id": 2, "komentari": "Darbojas uz 3 AAA tipa baterijām", "nosaukums": "Elektroniskie svari ES-25", "skaits": 15, "tips": "svari" },
+            { "apakstips": "plītiņa", "id": 3, "komentari": "Strāvas vada garums 1m", "nosaukums": "Elektriskā plītīņa", "skaits": 8, "tips": "sildītājs" },
+            { "apakstips": "trauki", "id": 4, "komentari": "Kolbas īpaši lielām vielām", "nosaukums": "Milzīgās kolbas", "skaits": 100, "tips": "trauks" },
+            { "apakstips": "stikls", "id": 5, "komentari": "Viegli plīstoša", "nosaukums": "Stikla mēģene", "skaits": 12, "tips": "trauks" }
+        ];
+
+        function formatDataForTable(item, kategoria) {
+            let svars = "";
+            if(kategoria === 'viela' && item.daudzums) {
+                svars = item.daudzums + " " + item.mervienibas;
+            }
+            return {
+                id: item.id,
+                nosaukums: item.nosaukums,
+                tips: item.tips,
+                apakstips: item.apakstips,
+                skaits: item.skaits,
+                svars: svars,
+                komentari: item.komentari
+            };
+        }
+
+        function renderTable(dataArray) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            
+            dataArray.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.nosaukums}</td>
+                    <td>${item.tips}</td>
+                    <td>${item.apakstips}</td>
+                    <td>${item.skaits}</td>
+                    <td>${item.svars}</td>
+                    <td>${item.komentari}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterData(filterType) {
+            document.getElementById('btn-visu').classList.remove('active');
+            document.getElementById('btn-vielas').classList.remove('active');
+            document.getElementById('btn-inventars').classList.remove('active');
+
+            let combinedData = [];
+
+            if (filterType === 'visu') {
+                document.getElementById('btn-visu').classList.add('active');
+                const formatedVielas = vielasData.map(v => formatDataForTable(v, 'viela'));
+                const formatedInventars = inventarsData.map(i => formatDataForTable(i, 'inventars'));
+                combinedData = [...formatedInventars, ...formatedVielas]; // Apvieno abus
+            } 
+            else if (filterType === 'vielas') {
+                document.getElementById('btn-vielas').classList.add('active');
+                combinedData = vielasData.map(v => formatDataForTable(v, 'viela'));
+            } 
+            else if (filterType === 'inventars') {
+                document.getElementById('btn-inventars').classList.add('active');
+                combinedData = inventarsData.map(i => formatDataForTable(i, 'inventars'));
+            }
+
+            renderTable(combinedData);
+        }
+
+        function navigate(viewId) {
+            document.getElementById('view1').classList.remove('active');
+            document.getElementById('view2').classList.remove('active');
+            document.getElementById('view3').classList.remove('active');
+            
+            if (viewId === 'view3') {
+                document.getElementById('split-layout').style.display = 'none';
+                document.getElementById('view3').classList.add('active');
+                // Ielādē visus datus atverot 3. formu
+                filterData('visu'); 
+            } else {
+                document.getElementById('split-layout').style.display = 'flex';
+                document.getElementById(viewId).classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
